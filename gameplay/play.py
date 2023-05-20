@@ -10,10 +10,22 @@ class Play:
         self.validMoves = {}
         self.screen = screen
 
+        self.win = 0
+        self.loss = 0
+        f = open("stats.txt", "r")
+        record = f.read()
+        self.win = record.count('W')
+        self.loss = record.count('L')
+        self.difficulty = 1
+        self.difficulty = self.difficulty + record.count('I') - record.count('D')
+
     # Updates any changes made to the board
     def update(self):
         self.board.draw(self.screen)
         self.showValid(self.validMoves)
+        font = pygame.font.SysFont('Comic Sans MS', 100)
+        text = font.render((str(self.win) + " - " + str(self.loss)), False, (0, 0, 0))
+        self.screen.blit(text, (850, 200))
 
         if (self.getWinner() != None):
             font = pygame.font.SysFont('Comic Sans MS', 100)
@@ -33,7 +45,7 @@ class Play:
             moved = self._move(row, col)
             # If unable to move to the selected destination, assume the user is trying to select a different piece instead of moving the selected one
             if not moved:
-                self.selected.selected = False #####
+                self.selected.selected = False
                 self.selected = None
                 self.validMoves = {}
                 self.selectPiece(row, col)
@@ -113,11 +125,58 @@ class Play:
         return None
 
     # Resets the game with initial values
-    def newGame(self):
+    def newGame(self, winner):
         self.selected = None
         self.board = Board()
         self.turn = "black"
         self.validMoves = {}
+        f = open("stats.txt", "a")
+        if winner == "black":
+            self.win = self.win + 1
+            f.write("W")
+        else: 
+            self.loss = self.loss + 1
+            f.write("L")
+        f.close()
+        self.updateDifficulty()
+
+    def updateDifficulty(self):
+        f = open("stats.txt", "r")
+        record = f.read()
+        if (len(record) >= 4):
+            last4 = record[-4:]
+            if (last4 == "WWWW" and self.difficulty < 8):
+                self.difficulty = self.difficulty + 1
+                f = open("stats.txt", "a")
+                f.write("I")
+                f.close()
+                return
+            if (last4 == "LLLL" and self.difficulty > 1):
+                self.difficulty = self.difficulty - 1
+                f = open("stats.txt", "a")
+                f.write("D")
+                f.close()
+                return
+        if len(record) < 5:
+            return
+        last5 = record[-5:]
+        if (last5.count('I') > 0) or (last5.count('D') > 0):
+            return
+        f.close()
+        wins = last5.count('W')
+        if (wins >= 4 and self.difficulty < 8):
+            self.difficulty = self.difficulty + 1
+            f = open("stats.txt", "a")
+            f.write("I")
+            f.close()
+        if (wins <= 1 and self.difficulty > 1):
+            self.difficulty = self.difficulty - 1
+            f = open("stats.txt", "a")
+            f.write("D")
+            f.close()
+
+    def getDifficulty(self):
+        return self.difficulty
 
     # Updates the board with the AI move made
     def moveAI(self, board):
