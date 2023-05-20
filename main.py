@@ -26,8 +26,6 @@ def main():
     while (play):
         clock.tick(FPS)
         
-        pygame.image.save(surface, "screenshot.jpeg")
-
         if (play.turn == "red"):
             value, newBoard = minimax(play.getBoard(), ((play.getDifficulty()+1)//2), True, play, play.getDifficulty())
             play.moveAI(newBoard)
