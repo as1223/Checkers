@@ -50,6 +50,19 @@ class Board:
             for j in range(8):
                 if (self.board[i][j] != 0):
                     self.board[i][j].draw(screen)
+        pygame.draw.line(screen, (0, 0, 0), (800, 0), (800, 800), 5)
+        pygame.draw.rect(screen, (0, 153, 153), (800, 0, 500, 800), 0)
+        self.drawRemaining(screen)
+
+    def drawRemaining(self, screen):
+        font = pygame.font.SysFont('Comic Sans MS', 20)
+        text = font.render("Captured Pieces", False, (0, 0, 0))
+        screen.blit(text, (870, 580))
+        pygame.draw.rect(screen, (0, 0, 0), (850, 620, 400, 130), 3)
+        for i in range(12-self.redRemaining):
+            pygame.draw.circle(screen, BOARD_RED, (880+31*i, 657), 12)
+        for i in range(12-self.blackRemaining):
+            pygame.draw.circle(screen, (0, 0, 0), (880+31*i, 713), 12)
 
     # Moves pieces on the board
     def movePiece(self, piece, row, col):
@@ -217,6 +230,13 @@ class Board:
     # Gets a "score" for the AI to use when determining if a move is good or bad
     def score(self):
         return self.redRemaining - self.blackRemaining
+    def score2(self):
+        kingMultiplier = 1.5
+        if (self.redRemaining < 4 or self.blackRemaining < 4):
+            kingMultiplier = 1
+        if (self.redRemaining > 9 and self.blackRemaining > 9):
+            kingMultiplier = 2
+        return self.redRemaining - self.blackRemaining + kingMultiplier*self.redKings - kingMultiplier*self.blackKings
     
     # Returns all pieces of a certain color for the AI to check the "score" of different moves
     def colorPieces(self, color):
