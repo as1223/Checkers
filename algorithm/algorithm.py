@@ -2,16 +2,19 @@ from copy import deepcopy
 import pygame
 
 # Applies the minimax algorithm to find the best move available
-def minimax(boardState, depth, maximizer, game):
+def minimax(boardState, depth, maximizer, game, difficulty):
     if (depth == 0) or (boardState.getWinner()):
-        return boardState.score(), boardState
+        if (difficulty % 2) == 1:
+            return boardState.score(), boardState
+        else:
+            return boardState.score2(), boardState
     
     # Maximizer tries to maximize score, minimizer tries to minimize it
     if maximizer:
         maxScore = -10000
         bestMove = None
         for move in getMovesPossible(boardState, "red", game):
-            newScore = minimax(move, depth-1, False, game)[0]
+            newScore = minimax(move, depth-1, False, game, difficulty)[0]
             maxScore = max(maxScore, newScore)
             if (maxScore == newScore):
                 bestMove = move
@@ -20,7 +23,7 @@ def minimax(boardState, depth, maximizer, game):
         minScore = 10000
         bestMove = None
         for move in getMovesPossible(boardState, "black", game):
-            newScore = minimax(move, depth-1, True, game)[0]
+            newScore = minimax(move, depth-1, True, game, difficulty)[0]
             minScore = min(minScore, newScore)
             if (minScore == newScore):
                 bestMove = move
