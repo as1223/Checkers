@@ -43,7 +43,6 @@ def main():
                     play.selectPiece(row, col)
 
         play.update()
-        print(play.getDifficulty())
 
     pygame.quit()
 
