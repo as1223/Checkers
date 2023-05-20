@@ -18,32 +18,35 @@ def getCoords(pos):
     col = x // SIZE
     return row, col
 
-def main(AI):
+def main():
     play = True
     clock = pygame.time.Clock()
     play = Play(surface)
 
     while (play):
         clock.tick(FPS)
+        
+        pygame.image.save(surface, "screenshot.jpeg")
 
-        if AI and (play.turn == "red"):
-            value, newBoard = minimax(play.getBoard(), 4, True, play)
+        if (play.turn == "red"):
+            value, newBoard = minimax(play.getBoard(), ((play.getDifficulty()+1)//2), True, play, play.getDifficulty())
             play.moveAI(newBoard)
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
+            if event.type == pygame.QUIT:
                 play = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if play.getWinner():
-                    play.newGame()
+                    play.newGame(play.getWinner())
                 mouseCoords = pygame.mouse.get_pos()
                 row, col = getCoords(mouseCoords)
-                play.selectPiece(row, col)
+                if (row < 8) and (col < 8):
+                    play.selectPiece(row, col)
 
         play.update()
+        print(play.getDifficulty())
 
     pygame.quit()
 
-# True to have AI on, False to turn it off
-main(False)
+main()
